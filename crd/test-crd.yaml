@@ -1,0 +1,9 @@
+kind: DbConfig
+apiVersion: api.jtthink.com/v1
+metadata:
+  name: my-dbconfig
+spec:
+  replicas: 2
+  # 赋值到app的配置中
+  dsn: "root:123456@tcp(172.17.38.90:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
+  maxIdleConn: 5

@@ -1,0 +1,94 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  # 名字必需与下面的 spec 字段匹配，并且格式为 '<名称的复数形式>.<组名>'
+  name: dbconfigs.api.jtthink.com
+spec:
+  # 分组名，在REST API中也会用到的，格式是: /apis/分组名/CRD版本
+  group: api.jtthink.com
+  # 范围是属于namespace的 ,可以是 Namespaced 或 Cluster
+  scope: Namespaced
+  # 列举此 CustomResourceDefinition 所支持的版本
+  versions:
+    - name: v1
+      # 是否有效
+      served: true
+      storage: true
+      # 额外打印或暴露字段
+      additionalPrinterColumns:
+#        - jsonPath: .status.readyReplicas
+#          name: Ready
+#          type: string
+        - jsonPath: .status.readyReplicas
+          name: Ready
+          type: string
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+        - name: MaxConnections
+          type: integer
+          jsonPath: .spec.maxOpenConn
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            # 状态字段字段
+            status:
+              type: object
+              properties:
+                readyReplicas:
+                  type: string
+                replicas:
+                  type: integer
+            spec:
+              type: object
+              properties:
+                replicas:
+                  type: integer
+                  # 字段合法性检测
+                  # https://kubernetes.io/zh/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/#validation
+                  # https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.0.md#schemaObject
+                  minimum: 1
+                  maximum: 10
+                dsn:
+                  type: string
+                maxOpenConn:
+                  type: integer
+                  minimum: 1
+                  maximum: 2000
+                  default: 15
+                maxIdleConn:
+                  type: integer
+                  minimum: 1
+                  maximum: 2000
+                  default: 5
+                maxLifeTime:
+                  type: integer
+                  minimum: 60 #最小60秒
+                  default: 600  #默认10分钟
+              # 字段合法性检测
+              required:
+                - replicas
+                - dsn
+      # https://kubernetes.io/zh/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/#subresources
+      subresources:
+        # 当启用了 status 子资源时，对应定制资源的 /status 子资源会被暴露出来。
+        status: {}
+        # 当启用了 scale 子资源时，定制资源的 /scale 子资源就被暴露出来。 针对 /scale 所发送的对象是 autoscaling/v1.Scale。
+        # 可以使用 kubectl scale 控制资源的副本数量
+        # kubectl scale --replicas=3 dc/my-dbconfig
+        scale:
+          # specReplicasPath 定义定制资源中对应 scale.spec.replicas 的 JSON 路径
+          specReplicasPath: .spec.replicas
+          # statusReplicasPath 定义定制资源中对应 scale.status.replicas 的 JSON 路径
+          statusReplicasPath: .status.replicas
+
+  names:
+    # 复数名
+    plural: dbconfigs
+    singular: dbconfig
+    kind: DbConfig
+    listKind: DbConfigList
+    shortNames:
+      - dc
+

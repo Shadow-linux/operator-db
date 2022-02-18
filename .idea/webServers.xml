@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="d4c9873c-7e7d-4b33-9fae-9df62225c298" name="opeartor">
+        <fileTransfer rootFolder="/opt/operator-db" accessType="SFTP" host="172.17.38.31" port="12330" sshConfigId="f9da8b12-5fcb-42c8-b146-db08d72793b0" sshConfig="root@172.17.38.31:12330 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
